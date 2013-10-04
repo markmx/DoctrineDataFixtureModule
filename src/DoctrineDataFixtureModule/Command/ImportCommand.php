@@ -30,6 +30,10 @@ use Symfony\Component\Console\Command\Command,
 use Doctrine\Common\DataFixtures\Loader;
 use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
 use Doctrine\Common\DataFixtures\Purger\ORMPurger;
+
+use Zend\ServiceManager\ServiceManager;
+use Zend\ServiceManager\ServiceManagerAwareInterface;
+
 /**
  * Command for generate migration classes by comparing your current database schema
  * to your mapping information.
@@ -39,11 +43,13 @@ use Doctrine\Common\DataFixtures\Purger\ORMPurger;
  * @since   2.0
  * @author  Jonathan Wage <jonwage@gmail.com>
  */
-class ImportCommand extends Command
+class ImportCommand extends Command implements ServiceManagerAwareInterface
 {
     protected $paths;
 
     protected $em;
+
+    protected $serviceManager;
 
     const PURGE_MODE_TRUNCATE = 2;
 
@@ -75,6 +81,13 @@ EOT
         foreach($this->paths as $key => $value) {
             $loader->loadFromDirectory($value);
         }
+
+        foreach ($loader->getFixtures() as $fixture) {
+            if ($fixture instanceof ServiceManagerAwareInterface) {
+                $fixture->setServiceManager($this->serviceManager);
+            }
+        }
+
         $executor->execute($loader->getFixtures(), $input->getOption('append'));
     }
 
@@ -86,5 +99,12 @@ EOT
     public function setEntityManager($em)
     {
         $this->em = $em;
+    }
+
+    public function setServiceManager(ServiceManager $serviceManager)
+    {
+        $this->serviceManager = $serviceManager;
+        
+        return $this;
     }
 }

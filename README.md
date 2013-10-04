@@ -1,3 +1,5 @@
+Note. This is a fork in order to provide the service manager to data fixtures classes.
+
 # DoctrineDataFixture Module for Zend Framework 2
 
 The DoctrineDataFixtureModule module intends to integrate Doctrine 2 data-fixture with Zend Framework 2 quickly

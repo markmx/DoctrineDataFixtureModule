@@ -28,6 +28,8 @@ use Doctrine\ORM\Tools\Console\ConsoleRunner;
 use DoctrineDataFixtureModule\Command\ImportCommand;
 use DoctrineDataFixtureModule\Service\FixtureFactory;
 
+use Zend\ServiceManager\ServiceManagerAwareInterface;
+
 /**
  * Base module for Doctrine Data Fixture.
  *
@@ -74,6 +76,11 @@ class Module implements
             $importCommand = new ImportCommand();
             $importCommand->setEntityManager($em);
             $importCommand->setPath($paths);
+
+            if ($importCommand instanceof ServiceManagerAwareInterface) {
+                $importCommand->setServiceManager($sm);
+            }
+
             ConsoleRunner::addCommands($cli);
             $cli->addCommands(array(
                 $importCommand
